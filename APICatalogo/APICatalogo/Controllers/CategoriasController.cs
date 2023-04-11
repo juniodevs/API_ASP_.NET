@@ -28,7 +28,7 @@ namespace APICatalogo.Controllers
         {
             try
             {
-                return _context.Categorias.AsNoTracking().ToList()
+                return _context.Categorias.AsNoTracking().ToList();
             }
             catch (Exception)
             {
