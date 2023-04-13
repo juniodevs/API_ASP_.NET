@@ -27,12 +27,22 @@ app.MapGet("frases", async () =>
 
 app.MapGet("/tarefas", async (AppDbContext db) => await db.Tarefas.ToListAsync());
 
+app.MapGet("/tarefas/{id}", async (int id, AppDbContext Db) =>
+    await Db.Tarefas.FindAsync(id) is Tarefa tarefa ? Results.Ok(tarefa) : Results.NotFound());
+
+app.MapGet("/tarefas/concluida", async (AppDbContext db) =>
+                                 await db.Tarefas.Where(t => t.IsConcluida).ToListAsync());
+
+app.MapGet("/tarefas/naoconcluida", async (AppDbContext db) =>
+                                 await db.Tarefas.Where(t => !t.IsConcluida).ToListAsync());
+
 app.MapPost("/tarefas", async (Tarefa tarefa, AppDbContext db) =>
 {
     db.Tarefas.Add(tarefa);
     await db.SaveChangesAsync();
     return Results.Created($"/tarefas/{tarefa.Id}", tarefa);
 });
+
 
 app.UseHttpsRedirection();
 app.Run();
