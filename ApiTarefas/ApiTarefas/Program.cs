@@ -2,12 +2,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("Tarefas"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+options.UseInMemoryDatabase("Tarefas"));
 
 
 var app = builder.Build();
@@ -43,6 +42,30 @@ app.MapPost("/tarefas", async (Tarefa tarefa, AppDbContext db) =>
     return Results.Created($"/tarefas/{tarefa.Id}", tarefa);
 });
 
+app.MapPut("/tarefas/{id}", async (int id, Tarefa inputTarefa, AppDbContext db) =>
+{
+    var tarefa = await db.Tarefas.FindAsync(id);
+
+    if (tarefa is null) return Results.NotFound();
+
+    tarefa.Nome = inputTarefa.Nome;
+    tarefa.IsConcluida = inputTarefa.IsConcluida;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapDelete("/tarefas/{id}", async (int id, AppDbContext db) =>
+{
+    if (await db.Tarefas.FindAsync(id) is Tarefa tarefa)
+    {
+        db.Tarefas.Remove(tarefa);
+        await db.SaveChangesAsync();
+        return Results.Ok();
+    }
+    return Results.NotFound();
+});
+
 
 app.UseHttpsRedirection();
 app.Run();
@@ -53,8 +76,6 @@ class Tarefa
     public int Id { get; set; }
     public string? Nome { get; set; }
     public bool IsConcluida { get; set; }
-
-
 }
 
 class AppDbContext : DbContext
@@ -62,8 +83,5 @@ class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) 
         : base(options)
     {}
-
     public DbSet<Tarefa> Tarefas => Set<Tarefa>();
-
-
 }
