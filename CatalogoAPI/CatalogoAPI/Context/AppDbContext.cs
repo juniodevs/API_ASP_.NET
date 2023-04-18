@@ -9,5 +9,10 @@ namespace CatalogoAPI.Context
         {}
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Produto> Produtos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder mb)
+        {
+            
+        }
     }
 }
