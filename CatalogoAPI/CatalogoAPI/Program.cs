@@ -15,6 +15,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+//definir endpoints
+
+app.MapGet("/", () => "Catálogo de Produtos - 2023");
+
+app.MapPost("/categorias",);
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
