@@ -16,8 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-//definir endpoints
-
+//definir endpoints para CATEGORIAS
 app.MapGet("/", () => "Catálogo de Produtos - 2023").ExcludeFromDescription();
 
 app.MapPost("/categorias", async (Categoria categoria, AppDbContext db) =>
@@ -66,15 +65,71 @@ app.MapDelete("/categorias/{id:int}", async(int id, AppDbContext db) =>
     await db.SaveChangesAsync();
 
     return Results.NoContent();
-}
-);
+});
+
+
+//definir endpoints para PRODUTOS
+
+app.MapPost("/produtos", async(AppDbContext db, Produto produto) =>
+{
+    if (produto is null)
+    {
+        return Results.NoContent();
+    }
+    db.Produtos.Add(produto);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/produtos/{produto.CategoriaId}", produto);
+});
+
+app.MapGet("/produtos", async(AppDbContext db) => await db.Produtos.ToListAsync());
+
+app.MapGet("/produtos/{id:int}", async (int id, AppDbContext db) =>
+{
+    return await db.Produtos.FindAsync(id)
+    is Produto produto
+    ? Results.Ok(produto)
+    : Results.NotFound();
+});
+
+app.MapPut("/produtos/{id:int}", async (int id, AppDbContext db, Produto produto) =>
+{
+    if (produto.ProdutoId != id)
+    {
+        Results.BadRequest();
+    }
+
+    var produtoDB = await db.Produtos.FindAsync(id);
+
+    produtoDB.Nome = produto.Nome;
+    produtoDB.Imagem = produto.Imagem;
+    produtoDB.Descricao = produto.Descricao;
+    produtoDB.Preco = produto.Preco;
+    produtoDB.DataCompra = produto.DataCompra;
+    produtoDB.Estoque = produto.Estoque;
+    produtoDB.CategoriaId = produto.CategoriaId;
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(produtoDB);
+});
+
+app.MapDelete("produtos/{id:int}", async (int id, AppDbContext db) =>
+{
+    var produto = await db.Produtos.FindAsync(id);
+
+    if(produto is null)
+    {
+        return Results.NoContent();
+    }
+    db.Produtos.Remove(produto);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
-
 app.Run();
