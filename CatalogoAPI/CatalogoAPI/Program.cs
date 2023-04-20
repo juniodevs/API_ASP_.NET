@@ -39,6 +39,8 @@ builder.Services.AddAuthentication
             };
         });
 
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // endpoint para LOGIN
@@ -76,7 +78,7 @@ app.MapPost("/categorias", async (Categoria categoria, AppDbContext db) =>
     return Results.Created($"/categorias/{categoria.CategoriaId}", categoria);
 });
 
-app.MapGet("/categorias", async(AppDbContext db) => await db.Categorias.ToListAsync());
+app.MapGet("/categorias", async(AppDbContext db) => await db.Categorias.ToListAsync()).RequireAuthorization();
 
 app.MapGet("/categorias/{id:int}", async(int id, AppDbContext db) =>
 {
@@ -181,9 +183,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.Run();
