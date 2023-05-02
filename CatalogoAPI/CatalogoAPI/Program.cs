@@ -1,9 +1,11 @@
 using CatalogoAPI.ApiEndpoints;
+using CatalogoAPI.AppServicesExtensions;
 using CatalogoAPI.Context;
 using CatalogoAPI.Models;
 using CatalogoAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -83,12 +85,11 @@ app.MapCategoriasEndpoints();
 
 app.MapProdutosEndpoints();
 
+var environment = app.Environment;
+app.useExceptionHandling(environment)
+    .UseSwaggerMiddleware()
+    .UseAppCors();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 app.UseAuthentication();
 app.UseAuthorization();
 
