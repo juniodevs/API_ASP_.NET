@@ -17,8 +17,9 @@ namespace APICatalogo.Controllers
         }
 
 
-        [HttpGet("primeiro")] // api/produtos/primeiro
-        [HttpGet("/primeiro")] // /primeiro
+        //[HttpGet("primeiro")] // api/produtos/primeiro
+        //[HttpGet("/primeiro")] // /primeiro
+        [HttpGet("{valor:alpha:length(5)}")]
         public ActionResult<Produto> GetPrimeiro()
         {
             var produto = _context.Produtos.FirstOrDefault();
@@ -43,11 +44,9 @@ namespace APICatalogo.Controllers
         }
 
         // api/produtos/id
-        [HttpGet("{id:int}/{nome:string}", Name="ObterProduto")]
-        public ActionResult<Produto> Get(int id, string nome)
+        [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
+        public ActionResult<Produto> Get(int id)
         {
-
-            string this.nome = nome;
 
             var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
             if (produto is null)
@@ -71,7 +70,7 @@ namespace APICatalogo.Controllers
                 new { id = produto.ProdutoId }, produto);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int(1)}")]
 
         public ActionResult Put(int id, Produto produto)
         {
@@ -84,7 +83,7 @@ namespace APICatalogo.Controllers
             return Ok(produto);
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int(1)}")]
         public ActionResult Delete(int id)
         {
             var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
