@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
-    [Route("[controller]")] // /Produtos
+    [Route("api/[controller]")] // /Produtos
     [ApiController]
     public class ProdutosController : ControllerBase
     {
@@ -17,7 +17,8 @@ namespace APICatalogo.Controllers
         }
 
 
-        [HttpGet("primeiro")] // /produtos/primeiro
+        [HttpGet("primeiro")] // api/produtos/primeiro
+        [HttpGet("/primeiro")] // /primeiro
         public ActionResult<Produto> GetPrimeiro()
         {
             var produto = _context.Produtos.FirstOrDefault();
@@ -29,7 +30,7 @@ namespace APICatalogo.Controllers
             return produto;
         }
 
-        [HttpGet] // /produtos 
+        [HttpGet] // api/produtos 
         public ActionResult<IEnumerable<Produto>> Get()
         {
             var produtos = _context.Produtos.AsNoTracking().ToList();
@@ -41,10 +42,13 @@ namespace APICatalogo.Controllers
             return produtos;
         }
 
-        // /produtos/id
-        [HttpGet("{id:int}", Name="ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        // api/produtos/id
+        [HttpGet("{id:int}/{nome:string}", Name="ObterProduto")]
+        public ActionResult<Produto> Get(int id, string nome)
         {
+
+            string this.nome = nome;
+
             var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
             if (produto is null)
             {
