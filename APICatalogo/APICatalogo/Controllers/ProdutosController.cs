@@ -31,6 +31,17 @@ namespace APICatalogo.Controllers
             return produto;
         }
 
+        [HttpGet]
+        public IActionResult GetFirst()
+        {
+            var produto = _context.Produtos.FirstOrDefault();
+            if (produto is null)
+            {
+                return NotFound("Produtos não encontrados");
+            }
+            return Ok(produto);
+        }
+
         [HttpGet] // api/produtos 
         public ActionResult<IEnumerable<Produto>> Get()
         {
