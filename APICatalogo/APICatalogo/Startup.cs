@@ -1,5 +1,3 @@
-using ApiCatalogo.Extensions;
-using ApiCatalogo.Filters;
 using ApiCatalogo.Services;
 using APICatalogo.Context;
 using Microsoft.AspNetCore.Builder;
