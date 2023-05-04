@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-#nullable disable
-
 namespace APICatalogo.Migrations
 {
     [DbContext(typeof(AppDbContext))]
@@ -16,24 +14,21 @@ namespace APICatalogo.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.15")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("APICatalogo.Models.Categoria", b =>
                 {
                     b.Property<int>("CategoriaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ImagemUrl")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
+                        .HasMaxLength(300);
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                        .HasMaxLength(80);
 
                     b.HasKey("CategoriaId");
 
@@ -43,35 +38,27 @@ namespace APICatalogo.Migrations
             modelBuilder.Entity("APICatalogo.Models.Produto", b =>
                 {
                     b.Property<int>("ProdutoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CategoriaId")
-                        .HasColumnType("int");
+                    b.Property<int>("CategoriaId");
 
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTime>("DataCadastro");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
+                        .HasMaxLength(300);
 
-                    b.Property<float>("Estoque")
-                        .HasColumnType("float");
+                    b.Property<float>("Estoque");
 
                     b.Property<string>("ImagemUrl")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
+                        .HasMaxLength(300);
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                        .HasMaxLength(80);
 
-                    b.Property<decimal>("Preco")
-                        .HasColumnType("decimal(10,2)");
+                    b.Property<decimal>("Preco");
 
                     b.HasKey("ProdutoId");
 
@@ -85,15 +72,7 @@ namespace APICatalogo.Migrations
                     b.HasOne("APICatalogo.Models.Categoria", "Categoria")
                         .WithMany("Produtos")
                         .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
-
-            modelBuilder.Entity("APICatalogo.Models.Categoria", b =>
-                {
-                    b.Navigation("Produtos");
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

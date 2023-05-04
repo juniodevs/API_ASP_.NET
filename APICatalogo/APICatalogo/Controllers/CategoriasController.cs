@@ -1,77 +1,76 @@
-﻿using APICatalogo.Context;
+﻿using ApiCatalogo.Services;
+using APICatalogo.Context;
 using APICatalogo.Models;
-using APICatalogo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace APICatalogo.Controllers
+namespace ApiCatalogo.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[Controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-       private readonly AppDbContext _context;
-
-        public CategoriasController(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+        public CategoriasController(AppDbContext contexto, 
+            IConfiguration config)
         {
-            _context = context;
+            _context = contexto;
+            _configuration = config;
         }
 
         [HttpGet("saudacao/{nome}")]
-        public ActionResult<string> GetSaudacao([FromServices] IMeuServico meuServico
-            , string nome)
+        public ActionResult<string> GetSaudacao([FromServices] IMeuServico meuservico, 
+            string nome)
         {
-            return meuServico.Saudacao(nome);
+            return meuservico.Saudacao(nome);
         }
+
+
+        //[HttpGet("autor")]
+        //public string GetAutor()
+        //{
+        //    var autor = _configuration["autor"];
+        //    var conexao = _configuration["ConnectionStrings:DefaultConnection"];
+
+        //    return $"Autor : {autor}  Conexao: {conexao}";
+        //}
 
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            //return _context.Categorias.Include(p=> p.Produtos).ToList();
-            return _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).ToList();
+            return _context.Categorias.Include(x=> x.Produtos).ToList();
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            try
-            {
-                return _context.Categorias.AsNoTracking().ToList();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    "Ocorreu um problema ao tratar sua solicitação");
-
-            }
+            return _context.Categorias.AsNoTracking().ToList();
         }
 
-        [HttpGet("{id:int}", Name = "ObterCategoria")]
+        [HttpGet("{id}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            try
-            {
-                var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
-                if (categoria is null)
-                {
-                    return NotFound("Categoria não encontrado");
-                }
+            var categoria = _context.Categorias.AsNoTracking()
+                .FirstOrDefault(p => p.CategoriaId == id);
 
-                return categoria;
-            }
-            catch (Exception)
+            if (categoria == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação");
+                return NotFound();
             }
-            
+            return categoria;
         }
 
         [HttpPost]
-        public ActionResult Post(Categoria categoria)
+        public ActionResult Post([FromBody]Categoria categoria)
         {
-            if (categoria is null)
-                return BadRequest();
+            //if(!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
             _context.Categorias.Add(categoria);
             _context.SaveChanges();
@@ -80,31 +79,37 @@ namespace APICatalogo.Controllers
                 new { id = categoria.CategoriaId }, categoria);
         }
 
-        [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Categoria categoria)
+        [HttpPut("{id}")]
+        public ActionResult Put(int id, [FromBody] Categoria categoria)
         {
+            //if(!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
             if (id != categoria.CategoriaId)
+            {
                 return BadRequest();
+            }
 
             _context.Entry(categoria).State = EntityState.Modified;
             _context.SaveChanges();
-
-            return Ok(categoria);
+            return Ok();
         }
 
-        [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        [HttpDelete("{id}")]
+        public ActionResult<Categoria> Delete(int id)
         {
             var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
-            //var produto = _context.Produtos.Find(id);
+            //var categoria = _context.Categorias.Find(id);
 
-            if (categoria is null)
-                return NotFound("Categoria não encontrada");
-
+            if (categoria == null)
+            {
+                return NotFound();
+            }
             _context.Categorias.Remove(categoria);
             _context.SaveChanges();
-
-            return Ok(categoria);
+            return categoria;
         }
     }
 }
+
