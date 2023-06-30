@@ -22,6 +22,15 @@ namespace ApiCatalogo.Controllers
             _configuration = config;
         }
 
+        [HttpGet("autor")]
+        public string GetAutor()
+        {
+            var autor = _configuration["autor"];
+            var conexao = _configuration["ConnectionStrings:DefaultConnection"];
+            return $"Autor : {autor}  Conexao: {conexao}";
+        }
+
+
         [HttpGet("saudacao/{nome}")]
         public ActionResult<string> GetSaudacao([FromServices] IMeuServico meuservico, 
             string nome)
